@@ -30,15 +30,15 @@ def fetch(username):
     except requests.exceptions.RequestException as e:
         print(e)
 def fetch_repos(username):
-        url = f"https://api.github.com/users/{username}/repos"
+    url = f"https://api.github.com/users/{username}/repos"
     
-        try:
-            response = requests.get(url,timeout=5)
-            response.raise_for_status()
-            data = response.json()
-            return data
-        except requests.exceptions.RequestException as e:
-            print(e)
+    try:
+        response = requests.get(url,timeout=5)
+        response.raise_for_status()
+        data = response.json()
+        return data
+    except requests.exceptions.RequestException as e:
+        print(e)
 
 def get_ai_summary(profile_for_ai):
     try:
@@ -51,8 +51,19 @@ def get_ai_summary(profile_for_ai):
     except Exception as e:
         print("Error:",e)
         return None
-
     return response.text
+
+def continue_or_exit():
+    while True:
+        _continue= input("Do you want to search another user(y/n)").lower()
+        if _continue == "y":
+            return True
+        elif _continue == "n":
+            print("exiting system...")
+            return False
+        else:
+            print("Invalid input")
+            continue
 def main():
     while True:
         username = input("Enter github username to get info:")
@@ -65,16 +76,15 @@ def main():
             print("Following:",data["following"])
             print("Followers:",data["followers"])
             print("public_repos:",data["public_repos"])
-
+            repo_list = []
             if repos is not None:
-                repo_list = []
                 print("=========Repo list========")
                 for repo in repos:
                     repo_list.append(repo["name"])
                     print("Repo_Name:",repo["name"])
                 print("===========================")
             else:
-                print("Repo is empty")
+                print("Could not fetch repositories")
 
             profile_for_ai = {
                 "UserName":data["login"],
@@ -88,21 +98,11 @@ def main():
                 print("Account Summary:",ai_summary)
             else:
                 print("Summary was not generated..")
-                        
-            _continue= input("Do you want to search another user(y/n)").lower()
-            if _continue == "y":
-                continue
-            elif _continue == "n":
-                print("exiting system...")
-                break
-            else:
-                print("Invalid input")
-                continue
 
+            if not continue_or_exit():
+                break
         else:
             print("Sorry couldnt fetch information")
             
-
-        
-
-main()
+if __name__ == "__main__":
+    main()
